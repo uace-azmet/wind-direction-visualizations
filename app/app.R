@@ -1,6 +1,6 @@
 
 
-# <App description>
+# Shiny app to visualize summaries of daily wind direction data
 
 # Add code for the following
 # 
@@ -46,7 +46,34 @@ ui <- htmltools::htmlTemplate(
       width = 4,
       
       verticalLayout(
-        selectInput("dataset", label = "Dataset", choices = ls("package:datasets"))
+        helpText(em(
+          "Select an AZMet station and specify the month or months of interest. Then, click or tap 'VISUALIZE WIND DIRECTION DATA'."
+        )),
+        
+        br(),
+        selectInput(
+          inputId = "azmetStation", 
+          label = "AZMet Station",
+          choices = stationNames[order(stationNames$stationName), ]$stationName,
+          selected = stationNames[order(stationNames$stationName), ]$stationName[1]
+        ),
+        
+        #br(),
+        #selectInput(
+        #  inputId = "monthsOfInterest",
+        #  label = "Months",
+        #  choices = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"),
+        #  selected = NULL,
+        #  multiple = TRUE,
+        #  selectize = TRUE
+        #),
+        
+        br(),
+        actionButton(
+          inputId = "visualizeWindDirectionData", 
+          label = "Visualize Wind Direction Data",
+          class = "btn btn-block btn-blue"
+        )
       )
     ), # sidebarPanel()
     
@@ -54,8 +81,7 @@ ui <- htmltools::htmlTemplate(
       id = "mainPanel",
       width = 8,
       
-      verbatimTextOutput("summary"),
-      tableOutput("table")
+      #
     ) # mainPanel()
   ) # sidebarLayout()
 ) # htmltools::htmlTemplate()
