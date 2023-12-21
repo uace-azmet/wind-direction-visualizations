@@ -52,11 +52,15 @@
   color: #828282; font-style: italic;
 }
 
-.table-subtitle {
+.figure-facets-subtitle {
   color: #343a40; font-weight: plain; margin-top: 0;
 }
 
-.table-title {
+.figure-main-subtitle {
+  color: #343a40; font-weight: plain; margin-top: 0;
+}
+
+.figure-title {
   color: #343a40; font-weight: bold; margin-bottom: 0; margin-top: 0;
 }
 
@@ -74,15 +78,15 @@
   background-color: #001C48; color: #fff;
 }
 
-#visualizeWindDirectionData {
+#visualizeData {
   background-color: transparent; border-color: #001C48; color: #001C48;
 }
 
-#visualizeWindDirectionData:active {
+#visualizeData:active {
   background-color: #001C48; color: #fff;
 }
 
-#visualizeWindDirectionData:hover {
+#visualizeData:hover {
   background-color: #001C48; color: #fff;
 }
 
