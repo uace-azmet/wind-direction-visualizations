@@ -1,5 +1,3 @@
-
-
 # Shiny app to visualize summaries of daily wind direction data
 
 # Add code for the following
@@ -20,6 +18,7 @@
 # Libraries
 library(azmetr)
 library(dplyr)
+library(ggplot2)
 library(htmltools)
 library(lubridate)
 library(shiny)
@@ -47,7 +46,7 @@ ui <- htmltools::htmlTemplate(
       
       verticalLayout(
         helpText(em(
-          "Select an AZMet station and specify the month or months of interest. Then, click or tap 'VISUALIZE WIND DIRECTION DATA'."
+          "Select an AZMet station and specify the month or months of interest. Then, click or tap 'VISUALIZE DATA'."
         )),
         
         br(),
@@ -70,8 +69,8 @@ ui <- htmltools::htmlTemplate(
         
         br(),
         actionButton(
-          inputId = "visualizeWindDirectionData", 
-          label = "Visualize Wind Direction Data",
+          inputId = "visualizeData", 
+          label = "Visualize Data",
           class = "btn btn-block btn-blue"
         )
       )
@@ -81,7 +80,27 @@ ui <- htmltools::htmlTemplate(
       id = "mainPanel",
       width = 8,
       
-      #
+      fluidRow(
+        column(width = 11, align = "left", offset = 1, htmlOutput(outputId = "figureTitle"))
+      ), 
+      
+      fluidRow(
+        column(width = 11, align = "left", offset = 1, htmlOutput(outputId = "figureMainSubtitle"))
+      ), 
+      
+      fluidRow(
+        column(width = 11, align = "left", offset = 1, plotOutput(outputId = "figureMain"))
+      ), 
+      br(),
+      
+      fluidRow(
+        column(width = 11, align = "left", offset = 1, htmlOutput(outputId = "figureFacetsSubtitle"))
+      ), 
+      
+      fluidRow(
+        column(width = 11, align = "left", offset = 1, plotOutput(outputId = "figureFacets"))
+      ), 
+      br()
     ) # mainPanel()
   ) # sidebarLayout()
 ) # htmltools::htmlTemplate()
@@ -93,16 +112,79 @@ server <- function(input, output, session) {
   
   # Reactive events -----
   
-  # Outputs -----
-  
-  output$summary <- renderPrint({
-    dataset <- get(input$dataset, "package:datasets")
-    summary(dataset)
+  # AZMet data ELT
+  dfAZMetData <- eventReactive(input$visualizeData, {
+    idPreview <- showNotification(
+      ui = "Preparing data visualization . . .", 
+      action = NULL, 
+      duration = NULL, 
+      closeButton = FALSE,
+      id = "idPreview",
+      type = "message"
+    )
+    
+    on.exit(removeNotification(id = idPreview), add = TRUE)
+    
+    fxnAZMetDataELT(
+      azmetStation = input$azmetStation,
+      timeStep = timeStep,
+      startDate = databaseStart,
+      endDate = databaseEnd)
   })
   
-  output$table <- renderTable({
-    dataset <- get(input$dataset, "package:datasets")
-    dataset
+  # Build figure - faceted polar plots
+  figureFacets <- eventReactive(input$visualizeData, {
+    fxnFigureFacets(inData = dfAZMetData())
+  })
+  
+  # Build faceted figure subtitle
+  figureFacetsSubtitle <- eventReactive(input$visualizeData, {
+    fxnFigureFacetsSubtitle(
+      startDate = databaseStart,
+      endDate = databaseEnd
+    )
+  })
+  
+  # Build figure - main polar plot
+  figureMain <- eventReactive(input$visualizeData, {
+    fxnFigureMain(inData = dfAZMetData())
+  })
+  
+  # Build main figure subtitle
+  figureMainSubtitle <- eventReactive(input$visualizeData, {
+    fxnFigureMainSubtitle(
+      startDate = databaseStart,
+      endDate = databaseEnd)
+  })
+  
+  # Build figure title
+  figureTitle <- eventReactive(input$visualizeData, {
+    fxnFigureTitle(
+      azmetStation = input$azmetStation, 
+      timeStep = timeStep
+    )
+  })
+  
+  # Outputs -----
+  
+  output$figureFacets <- renderPlot({
+    figureFacets()
+  }, res = 48)
+  
+  output$figureFacetsSubtitle <- renderUI({
+    figureFacetsSubtitle()
+  })
+  
+  output$figureMain <- renderPlot({
+    figureMain()
+  }, res = 96)
+  
+  output$figureMainSubtitle <- renderUI({
+    figureMainSubtitle()
+  })
+  
+  output$figureTitle <- renderUI({
+    figureTitle()
   })
 }
 

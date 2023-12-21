@@ -25,7 +25,8 @@ df <- azmetr::az_daily(station_id = "az01", start_date = databaseStart, end_date
 
 ggplot(data = df, mapping = aes(x = wind_vector_dir)) +  
   geom_histogram(binwidth = 22.5, boundary = 0.0, colour = "white", fill = "#001c48", linewidth = .25) +
-  coord_radial(expand = FALSE, r_axis_inside = FALSE, donut = 0) +
+  #coord_radial(expand = FALSE, r_axis_inside = FALSE, donut = 0) +
+  coord_polar() +
   scale_x_continuous(
     breaks = seq(from = 0, to = 360 - 1, by = 45),
     limits = c(0, 360)
@@ -34,7 +35,7 @@ ggplot(data = df, mapping = aes(x = wind_vector_dir)) +
   #  breaks = seq(from = 0, to = max(df$wind_vector_dir, na.rm = TRUE), by = 50),
     #limits = c(0, max(df$wind_vector_dir, na.rm = TRUE))
   #) +
-  #facet_wrap(facets = lubridate::month(df$datetime), ncol = 3)
+  facet_wrap(facets = lubridate::month(df$datetime), ncol = 3)
   theme_minimal()
 
 ggsave(file = paste0("tuc-wind-direction", "-", Sys.Date(), ".png"))
@@ -63,6 +64,9 @@ ggsave(file = paste0("tuc-wind-direction", "-", Sys.Date(), ".png"))
 #  )
   
   
+# https://community.rstudio.com/t/how-facet-wrap-or-subplot-multiple-graphs/92848
+# https://plotly.com/r/polar-chart/
+# 
 # https://www.kuan-liu.com/posts/2022/02/creating-static-and-interactive-nightingale-rose-diagram-using-ggplot-and-plotly-in-r/
 library(DT)
   
